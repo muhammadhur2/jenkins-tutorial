@@ -26,18 +26,18 @@ pipeline {
                 }
             }
         }
-//         stage('Deploy to Kubernetes') {
-//             steps {
-//                 script {
-//                     // Update the image in the deployment YAML file
-//                     def imageName = "muhammadhur/tutorial:${env.BUILD_NUMBER}"
-//                     sh "sed -i 's|muhammadhur/tutorial:latest|${imageName}|' ./deployment.yaml"
-//                     // Apply the deployment
-//                     withCredentials([file(credentialsId: 'kube', variable: 'KUBECONFIG')]) {
-//                     sh 'kubectl apply -f ./deployment.yaml'
-// }
-//                 }
-//             }
-//         }
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    // Update the image in the deployment YAML file
+                    def imageName = "muhammadhur/tutorial:${env.BUILD_NUMBER}"
+                    sh "sed -i 's|muhammadhur/tutorial:latest|${imageName}|' ./deployment.yaml"
+                    // Apply the deployment
+                    withCredentials([file(credentialsId: 'kube', variable: 'KUBECONFIG')]) {
+                    sh 'kubectl apply -f ./deployment.yaml'
+}
+                }
+            }
+        }
     }
 }
