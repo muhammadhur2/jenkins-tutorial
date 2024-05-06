@@ -45,12 +45,6 @@ pipeline {
                                     removePrefix: "",
                                     remoteDirectory: ".",
                                     execCommand: "kubectl apply -f ./deployment.yaml"
-                                ),
-                                sshTransfer(
-                                    sourceFiles: "service.yaml",
-                                    removePrefix: "",
-                                    remoteDirectory: ".",
-                                    execCommand: "kubectl apply -f ./service.yaml"
                                 )
                             ]
                         )
