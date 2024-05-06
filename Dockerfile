@@ -15,5 +15,6 @@ RUN npm install
 # Copy local code to the container image.
 COPY . .
 
+EXPOSE 3000
 # The command to run your application in development mode.
 CMD [ "npm", "run", "dev" ]
