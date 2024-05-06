@@ -37,15 +37,14 @@ pipeline {
                     // Use Publish Over SSH to copy the file and execute the command
                     sshPublisher(publishers: [
                         sshPublisherDesc(
-                            configName: "final-project",
+                            configName: "YOUR_SSH_SERVER_NAME",
                             transfers: [
                                 sshTransfer(
-                                    sourceFiles: "deployment.yaml",
-                                    removePrefix: "path/to/deployment",
-                                    remoteDirectory: "."
+                                    sourceFiles: "deployment.yaml",  // directly in the workspace root
+                                    remoteDirectory: ".",  // Place directly in the specified remote directory
+                                    execCommand: "kubectl apply -f ./deployment.yaml"  // Execute command in the remote directory
                                 )
-                            ],
-                            execCommand: "kubectl apply -f ./deployment.yaml"
+                            ]
                         )
                     ])
                 }
