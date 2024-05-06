@@ -33,16 +33,18 @@ pipeline {
 
                     // Update the image in the deployment file
                     sh "sed -i 's|muhammadhur/tutorial:latest|${imageName}|' ./deployment.yaml"
+                    // Optionally, update service.yaml if it references the image
 
-                    // Use Publish Over SSH to copy the file and execute the command
+                    // Use Publish Over SSH to copy the files and execute the command
                     sshPublisher(publishers: [
                         sshPublisherDesc(
                             configName: "final-project",
                             transfers: [
                                 sshTransfer(
-                                    sourceFiles: "deployment.yaml",  // directly in the workspace root
+                                    sourceFiles: "deployment.yaml,service.yaml",  // Including both files
+                                    removePrefix: "",  // Assuming files are in the root
                                     remoteDirectory: ".",  // Place directly in the specified remote directory
-                                    execCommand: "kubectl apply -f ./deployment.yaml"  // Execute command in the remote directory
+                                    execCommand: "kubectl apply -f ./deployment.yaml && kubectl apply -f ./service.yaml"  // Execute command in the remote directory
                                 )
                             ]
                         )
