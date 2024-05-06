@@ -30,7 +30,7 @@ pipeline {
             steps {
                 script {
                     def imageName = "muhammadhur/tutorial:${env.BUILD_NUMBER}"
-                    sh "docker run -d -p 3005:3000 ${imageName}"
+                    sh "docker run -d ${imageName}"
                 }
             }
         }
