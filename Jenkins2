@@ -20,9 +20,9 @@ pipeline {
                     def imageName = "muhammadhur/tutorial:${env.BUILD_NUMBER}"
                     withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
                         sh "docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASS docker.io"
+                        sh "docker push ${imageName}"
+                        sh "docker logout"
                     }
-                    sh "docker push ${imageName}"
-                    sh "docker logout"
                 }
             }
         }
@@ -30,20 +30,24 @@ pipeline {
             steps {
                 script {
                     def imageName = "muhammadhur/tutorial:${env.BUILD_NUMBER}"
-                    def serverIP = "52.146.33.247"
-                    def adminUser = "useradmin"
-                    def adminPass = "@@La12345678##"
 
                     // Update the image in the deployment file
                     sh "sed -i 's|muhammadhur/tutorial:latest|${imageName}|' ./deployment.yaml"
 
-                    // SCP the updated deployment file to the server
-                    withCredentials([usernamePassword(credentialsId: 'server-ssh', usernameVariable: 'SSH_USER', passwordVariable: 'SSH_PASS')]) {
-                        sh "scp -o StrictHostKeyChecking=no ./deployment.yaml ${SSH_USER}@${serverIP}:/path/to/deployment"
-                    }
-
-                    // SSH into the server and deploy using kubectl
-                    sh "ssh -o StrictHostKeyChecking=no ${SSH_USER}@${serverIP} 'kubectl apply -f /path/to/deployment/deployment.yaml'"
+                    // Use Publish Over SSH to copy the file and execute the command
+                    sshPublisher(publishers: [
+                        sshPublisherDesc(
+                            configName: "YOUR_SSH_SERVER_NAME",
+                            transfers: [
+                                sshTransfer(
+                                    sourceFiles: "deployment.yaml",
+                                    removePrefix: "path/to/deployment",
+                                    remoteDirectory: "."
+                                )
+                            ],
+                            execCommand: "kubectl apply -f ./deployment.yaml"
+                        )
+                    ])
                 }
             }
         }
