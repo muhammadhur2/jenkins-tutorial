@@ -41,10 +41,16 @@ pipeline {
                             configName: "final-project",
                             transfers: [
                                 sshTransfer(
-                                    sourceFiles: "deployment.yaml,service.yaml",  // Including both files
-                                    removePrefix: "",  // Assuming files are in the root
-                                    remoteDirectory: ".",  // Place directly in the specified remote directory
-                                    execCommand: "kubectl apply -f ./deployment.yaml && kubectl apply -f ./service.yaml"  // Execute command in the remote directory
+                                    sourceFiles: "deployment.yaml",
+                                    removePrefix: "",
+                                    remoteDirectory: ".",
+                                    execCommand: "kubectl apply -f ./deployment.yaml"
+                                ),
+                                sshTransfer(
+                                    sourceFiles: "service.yaml",
+                                    removePrefix: "",
+                                    remoteDirectory: ".",
+                                    execCommand: "kubectl apply -f ./service.yaml"
                                 )
                             ]
                         )
