@@ -26,14 +26,6 @@ pipeline {
                 }
             }
         }
-        stage('Test Docker Locally') {
-            steps {
-                script {
-                    def imageName = "muhammadhur/tutorial:${env.BUILD_NUMBER}"
-                    sh "docker run -d -p 3000:3000 ${imageName}"
-                }
-            }
-        }
         stage('Deploy to Kubernetes') {
             steps {
                 script {
