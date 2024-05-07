@@ -26,11 +26,27 @@ pipeline {
                 }
             }
         }
-        stage('Test Docker Locally') {
+        stage('Test Docker Image Remotely') {
             steps {
                 script {
                     def imageName = "muhammadhur/tutorial:${env.BUILD_NUMBER}"
-                    sh "docker run -d -p 3000:3000 ${imageName}"
+                    // SSH command to pull and run the Docker image on a remote machine
+                    sshPublisher(publishers: [
+                        sshPublisherDesc(
+                            configName: "final-project",
+                            transfers: [
+                                sshTransfer(
+                                    sourceFiles: "",
+                                    removePrefix: "",
+                                    remoteDirectory: ".",
+                                    execCommand: """
+                                    docker pull ${imageName} &&
+                                    docker run -d -p 3000:3000 ${imageName}
+                                    """
+                                )
+                            ]
+                        )
+                    ])
                 }
             }
         }
