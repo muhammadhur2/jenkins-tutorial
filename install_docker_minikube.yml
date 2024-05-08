@@ -1,0 +1,62 @@
+---
+- name: Setup Docker and Kubernetes tools
+  hosts: all
+  become: true  # Gain elevated privileges
+  vars:
+    user: "{{ ansible_user }}"  # Default user for the ansible session
+
+  tasks:
+    - name: Update and upgrade apt packages
+      apt:
+        update_cache: yes
+        upgrade: full
+
+    - name: Install required packages for Docker and Kubernetes
+      apt:
+        name:
+          - apt-transport-https
+          - curl
+          - docker.io
+        state: present
+
+    - name: Enable Docker service
+      systemd:
+        name: docker
+        enabled: true
+        state: started
+
+    - name: Install additional packages
+      apt:
+        name:
+          - curl
+          - wget
+          - apt-transport-https
+        state: present
+
+    - name: Download Minikube
+      get_url:
+        url: "https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64"
+        dest: "/usr/local/bin/minikube"
+        mode: '0755'
+
+    - name: Download the latest stable kubectl release version
+      shell: curl -L -s https://dl.k8s.io/release/stable.txt
+      register: stable_kubectl_version
+
+    - name: Download kubectl binary
+      get_url:
+        url: "https://dl.k8s.io/release/{{ stable_kubectl_version.stdout }}/bin/linux/amd64/kubectl"
+        dest: "/usr/local/bin/kubectl"
+        mode: '0755'
+
+    - name: Add the current user to the Docker group
+      user:
+        name: "{{ user }}"
+        groups: docker
+        append: yes
+
+    - name: Change group to Docker without logging out
+      command: newgrp docker
+
+    - name: Start Minikube with Docker driver
+      command: minikube start --driver=docker --force
